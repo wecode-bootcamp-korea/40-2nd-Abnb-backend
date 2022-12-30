@@ -2,6 +2,7 @@
 schema.sql
 node_modules/
 db/schema.sql
+.env.test
 
 # Created by https://www.toptal.com/developers/gitignore/api/macos,visualstudiocode,node,dotenv,vim,linux,windows,zsh,webstorm
 # Edit at https://www.toptal.com/developers/gitignore?templates=macos,visualstudiocode,node,dotenv,vim,linux,windows,zsh,webstorm
