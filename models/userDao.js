@@ -4,8 +4,8 @@ const getUserByKakaoId = async (id) => {
   try {
     const [result] = await appDataSource.query(
       `
-    SELECT 
-        u.kakao_id
+    SELECT
+        u.id
     FROM 
         users u
     WHERE
@@ -13,7 +13,7 @@ const getUserByKakaoId = async (id) => {
     `,
       [id]
     );
-    return result;
+    return result.id;
   } catch (err) {
     console.log(err);
     const error = new Error("DATABASE_ERROR");

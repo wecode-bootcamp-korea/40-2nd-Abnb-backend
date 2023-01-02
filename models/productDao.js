@@ -1,4 +1,4 @@
-const { appDataSource } = require("./data-source");
+const { appDataSource } = require('./data-source');
 
 const getProductById = async (productId) => {
   const products = await appDataSource.query(
@@ -35,7 +35,7 @@ const getProductById = async (productId) => {
             GROUP BY
                 product_id
         ) pi
-         ON
+        ON
             pi.product_id = p.id
         INNER JOIN (
             SELECT
@@ -61,7 +61,38 @@ const getProductById = async (productId) => {
 
   return products;
 };
-
+const createBooking = async (
+  productId,
+  guestId,
+  guestNumber,
+  checkIn,
+  checkOut,
+  totalPrice
+) => {
+  try {
+    return await appDataSource.query(
+      `
+    INSERT INTO bookings (
+      product_id,
+      guest_id,
+      guest_number,
+      check_in_date,
+      check_out_date,
+      total_price
+      ) 
+    VALUES (
+    ?, ?, ?, ?, ?, ?
+    )`,
+      [productId, guestId, guestNumber, checkIn, checkOut, totalPrice]
+    );
+  } catch (err) {
+    console.log(err);
+    const error = new Error('DATABASE_ERROR');
+    error.statusCode = 500;
+    throw error;
+  }
+};
 module.exports = {
+  createBooking,
   getProductById,
 };
