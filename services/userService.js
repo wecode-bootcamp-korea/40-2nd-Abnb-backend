@@ -1,14 +1,14 @@
-const jwt = require('jsonwebtoken');
-require('dotenv').config();
-const userDao = require('../models/userDao');
-const axios = require('axios');
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
+const userDao = require("../models/userDao");
+const axios = require("axios");
 
 const login = async (kakaoToken) => {
   try {
-    const kakaoUserInfo = await axios.get('https://kapi.kakao.com/v2/user/me', {
+    const kakaoUserInfo = await axios.get("https://kapi.kakao.com/v2/user/me", {
       headers: {
         authorization: `Bearer ${kakaoToken}`,
-        'Content-type': 'application/x-www-form-urlencoded;charset=utf-8',
+        "Content-type": "application/x-www-form-urlencoded;charset=utf-8",
       },
     });
 
@@ -17,6 +17,7 @@ const login = async (kakaoToken) => {
     const name = kakaoUserInfo.data.properties.nickname || null;
     const email = kakaoUserInfo.data.kakao_account.email;
     const user = await userDao.getUserByKakaoId(kakaoId);
+    4;
 
     if (!user) {
       await userDao.createUser(kakaoId, profileImage, name, email);

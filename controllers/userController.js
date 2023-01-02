@@ -1,11 +1,11 @@
-const userServices = require('../services/userServices');
+const userServices = require("../services/userService");
 
 const login = async (req, res) => {
   try {
     const kakaoToken = req.headers.authorization;
 
     if (!kakaoToken) {
-      return res.status(400).json({ message: 'NEED_ACCESS_TOKEN' });
+      return res.status(400).json({ message: "NEED_ACCESS_TOKEN" });
     }
 
     const accessToken = await userServices.login(kakaoToken);
