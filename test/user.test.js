@@ -1,13 +1,13 @@
-const dotenv = require('dotenv');
-const request = require('supertest');
-const { appDataSource } = require('../models/data-source');
-const { createApp } = require('../app');
-const axios = require('axios');
+const dotenv = require("dotenv");
+const request = require("supertest");
+const { appDataSource } = require("../models/data-source");
+const { createApp } = require("../app");
+const axios = require("axios");
 dotenv.config();
 
-jest.mock('axios');
+jest.mock("axios");
 
-describe('social-login', () => {
+describe("social-login", () => {
   let app;
 
   beforeAll(async () => {
@@ -21,32 +21,32 @@ describe('social-login', () => {
     await appDataSource.destroy();
   });
 
-  test('FAILED: NEED_ACCESS_TOKEN', async () => {
+  test("FAILED: NEED_ACCESS_TOKEN", async () => {
     await request(app)
-      .post('/users/login')
+      .post("/users/login")
       .expect(400)
-      .expect({ message: 'NEED_ACCESS_TOKEN' });
+      .expect({ message: "NEED_ACCESS_TOKEN" });
   });
 
-  test('SUCCESS: BODY_WITH_TOKEN', async () => {
+  test("SUCCESS: BODY_WITH_TOKEN", async () => {
     axios.get = jest.fn().mockReturnValue({
       data: {
         id: 12124124,
         properties: {
-          profile_image: 'skldjkalsdjkladjsk',
-          name: 'hihihi',
+          profile_image: "skldjkalsdjkladjsk",
+          name: "hihihi",
         },
         kakao_account: {
-          email: 'asdadsasd@sadasdasds',
+          email: "asdadsasd@sadasdasds",
         },
       },
     });
     await request(app)
-      .post('/users/login')
-      .set('authorization', 'test')
+      .post("/users/login")
+      .set("authorization", "test")
       .expect(200)
       .then((res) => {
-        expect(res.body).toHaveProperty('accessToken');
+        expect(res.body).toHaveProperty("accessToken");
       });
   });
 });

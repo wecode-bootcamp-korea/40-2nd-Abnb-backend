@@ -1,4 +1,4 @@
-const { appDataSource } = require('./data-source');
+const { appDataSource } = require("./data-source");
 
 const getUserByKakaoId = async (id) => {
   try {
@@ -16,7 +16,7 @@ const getUserByKakaoId = async (id) => {
     return result;
   } catch (err) {
     console.log(err);
-    const error = new Error('DATABASE_ERROR');
+    const error = new Error("DATABASE_ERROR");
     error.statusCode = 500;
     throw error;
   }
@@ -39,7 +39,7 @@ const createUser = async (id, image, name, email) => {
     );
   } catch (err) {
     console.log(err);
-    const error = new Error('DATABASE_ERROR');
+    const error = new Error("DATABASE_ERROR");
     error.statusCode = 500;
     throw error;
   }
