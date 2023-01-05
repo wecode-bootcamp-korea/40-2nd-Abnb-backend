@@ -1,10 +1,13 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const productController = require('../controllers/productController');
-const { validation } = require('../middlewares/validation');
+const multer = require("multer");
+const upload = multer({ dest: "uploads/" });
+const productController = require("../controllers/productController");
+const { validation } = require("../middlewares/validation");
 
-router.get('/:productId', productController.getProductById);
+router.get("/:productId", productController.getProductById);
 
-router.post('/booking', validation, productController.createBooking);
+// router.post("/booking", validation, productController.createBooking);
+router.post("/host", upload.array("imgs", 13), productController.createHost);
 
 module.exports = router;

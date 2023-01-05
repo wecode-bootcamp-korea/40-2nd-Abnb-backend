@@ -1,5 +1,5 @@
-const productDao = require('../models/productDao');
-const userDao = require('../models/userDao');
+const productDao = require("../models/productDao");
+const userDao = require("../models/userDao");
 
 const getProductById = async (productId) => {
   const result = await productDao.getProductById(productId);
@@ -28,7 +28,42 @@ const createBooking = async (
     throw err;
   }
 };
+
+const createHost = async (
+  category,
+  roomType,
+  title,
+  description,
+  guest,
+  bedroom,
+  bed,
+  bathroom,
+  address,
+  lat,
+  lng,
+  price,
+  images
+) => {
+  const result = await productDao.createHost(
+    category,
+    roomType,
+    title,
+    description,
+    guest,
+    bedroom,
+    bed,
+    bathroom,
+    address,
+    lat,
+    lng,
+    price,
+    images
+  );
+  return result;
+};
+
 module.exports = {
   createBooking,
   getProductById,
+  createHost,
 };

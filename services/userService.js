@@ -27,7 +27,7 @@ const login = async (kakaoToken) => {
 
     const accessToken = jwt.sign({ userId: kakaoId }, process.env.JWT_SECRET);
 
-    return accessToken;
+    return accessssToken;
   } catch (err) {
     console.log(err);
     throw err;
