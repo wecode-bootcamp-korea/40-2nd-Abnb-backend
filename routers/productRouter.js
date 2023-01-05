@@ -7,4 +7,6 @@ router.get('/:productId', productController.getProductById);
 
 router.post('/booking', validation, productController.createBooking);
 
+router.get('/', productController.getAllProduct);
+
 module.exports = router;
