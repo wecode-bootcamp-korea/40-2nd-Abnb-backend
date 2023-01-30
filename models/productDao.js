@@ -1,5 +1,15 @@
-const { appDataSource } = require('./data-source');
+const { appDataSource } = require("./data-source");
 
+const category = {
+  한옥: 1,
+  바다: 2,
+  캠핑: 3,
+};
+const roomType = {
+  guest: 1,
+  private: 2,
+  public: 3,
+};
 const getProductById = async (productId) => {
   const products = await appDataSource.query(
     `
@@ -87,9 +97,86 @@ const createBooking = async (
     );
   } catch (err) {
     console.log(err);
-    const error = new Error('DATABASE_ERROR');
+    const error = new Error("DATABASE_ERROR");
     error.statusCode = 500;
     throw error;
+  }
+};
+
+const createHost = async (
+  categoryId,
+  roomTypeId,
+  title,
+  description,
+  guest,
+  bedroom,
+  bed,
+  bathroom,
+  address,
+  lat,
+  lng,
+  price,
+  images
+) => {
+  const queryRunner = appDataSource.createQueryRunner();
+
+  await queryRunner.startTransaction();
+  console.log("category", category[categoryId]);
+  console.log("roomType", roomType[roomTypeId]);
+  try {
+    const result = await queryRunner.query(
+      `
+        INSERT INTO products (
+          category_id,
+          room_type_id,
+          latitude,
+          longtitude,
+          bedroom,
+          maximum_guest,
+          bed,
+          bathroom,
+          address,
+          title,
+          description,
+          price,
+          host_id
+          ) 
+        VALUES (
+        ?, ?, ?, ?, ?,
+        ?, ?, ?, ?, ?,
+        ?, ?, 2
+        )`,
+      [
+        category[categoryId],
+        roomType[roomTypeId],
+        lat,
+        lng,
+        bedroom,
+        guest,
+        bed,
+        bathroom,
+        address,
+        title,
+        description,
+        price,
+      ]
+    );
+    console.log("done?", result);
+    console.log("done!", result.id);
+    await queryRunner.query(
+      `
+        INSERT INTO images (
+          image_url,
+          product_id
+          )
+          VALUES ("${images[0]}", ${result.insertId}),('${images[1]}',${result.insertId}),("${images[2]}",${result.insertId}),('${images[3]}',${result.insertId}),('${images[4]}',${result.insertId})`
+    );
+    await queryRunner.commitTransaction();
+  } catch (err) {
+    console.log(err);
+    await queryRunner.rollbackTransaction();
+  } finally {
+    await queryRunner.release();
   }
 };
 
@@ -198,4 +285,5 @@ module.exports = {
   getBookedProduct,
   createBooking,
   getProductById,
+  createHost,
 };
