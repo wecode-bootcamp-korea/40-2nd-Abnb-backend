@@ -10,4 +10,6 @@ router.get("/:productId", productController.getProductById);
 // router.post("/booking", validation, productController.createBooking);
 router.post("/host", upload.array("imgs", 13), productController.createHost);
 
+router.get('/', productController.getAllProduct);
+
 module.exports = router;

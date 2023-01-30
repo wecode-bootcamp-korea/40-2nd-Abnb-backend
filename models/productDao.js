@@ -30,39 +30,39 @@ const getProductById = async (productId) => {
         u.name,
         pi.image_url,
         pc.dates
-        FROM 
-            products p
-        INNER JOIN
-            users u
-        ON
-            p.host_id = u.id
-        INNER JOIN (
-            SELECT
-                product_id,
-                JSON_ARRAYAGG(image_url) as image_url
-            FROM
-                images
-            GROUP BY
-                product_id
+    FROM 
+        products p
+    INNER JOIN
+        users u
+    ON
+        p.host_id = u.id
+    INNER JOIN (
+          SELECT
+              product_id,
+              JSON_ARRAYAGG(image_url) as image_url
+          FROM
+              images
+          GROUP BY
+              product_id
         ) pi
-        ON
-            pi.product_id = p.id
-        INNER JOIN (
-            SELECT
-                product_id,
-                JSON_ARRAYAGG(
-                    JSON_OBJECT(
-                        "check_in_date", check_in_date,
-                        "check_out_date", check_out_date
+    ON
+      pi.product_id = p.id
+        LEFT JOIN (
+          SELECT
+              product_id,
+              JSON_ARRAYAGG(
+                  JSON_OBJECT(
+                      "check_in_date", check_in_date,
+                      "check_out_date", check_out_date
                     )
                 ) as dates
-            FROM 
-                bookings
-            GROUP BY
-                product_id
+        FROM 
+            bookings
+        GROUP BY
+            product_id
         ) pc
         ON 
-            p.id = pc.product_id
+          p.id = pc.product_id
         WHERE
             p.id = ?
         `,
@@ -180,7 +180,109 @@ const createHost = async (
   }
 };
 
+const getAllProduct = async (page) => {
+  const offset = page * 8;
+  try {
+    return await appDataSource.query(`
+    SELECT
+        p.id,
+        p.title,
+        p.address,
+        p.price,
+        pi.image_url
+    FROM
+        products p
+    INNER JOIN (
+      SELECT
+          product_id,
+          JSON_ARRAYAGG(image_url) as image_url
+      FROM
+          images
+      GROUP BY
+          product_id
+      ) pi
+    ON
+        pi.product_id = p.id
+    INNER JOIN
+        categories c
+    ON
+        c.id = p.category_id
+    INNER JOIN
+        room_types r
+    ON
+        r.id = p.room_type_id
+    GROUP BY
+        p.id
+    LIMIT ${offset}, 8
+  `);
+  } catch (err) {
+    console.log(err);
+    const error = new Error('DATABASE_ERROR');
+    error.statusCode = 500;
+    throw error;
+  }
+};
+
+const getProductsByQuery = async (page, queryClause) => {
+  const offset = page * 8;
+  try {
+    return await appDataSource.query(`
+    SELECT
+        p.id,
+        p.title,
+        p.address,
+        p.price,
+        pi.image_url
+    FROM
+        products p
+    INNER JOIN (
+      SELECT
+          product_id,
+          JSON_ARRAYAGG(image_url) as image_url
+      FROM
+          images
+      GROUP BY
+          product_id
+      ) pi
+    ON
+        pi.product_id = p.id
+    INNER JOIN
+        categories c
+    ON
+        c.id = p.category_id
+    INNER JOIN
+        room_types r
+    ON
+        r.id = p.room_type_id
+    WHERE
+        ${queryClause}
+    GROUP BY
+        p.id
+    LIMIT ${offset}, 8
+  `);
+  } catch (err) {
+    console.log(err);
+    const error = new Error('DATABASE_ERROR');
+    error.statusCode = 500;
+    throw error;
+  }
+};
+
+const getBookedProduct = async (bookingClause) => {
+  return await appDataSource.query(`
+  SELECT 
+      product_id as id
+  FROM 
+      bookings
+  WHERE
+    ${bookingClause}
+`);
+};
 module.exports = {
+  getAllProduct,
+  getProductById,
+  getProductsByQuery,
+  getBookedProduct,
   createBooking,
   getProductById,
   createHost,

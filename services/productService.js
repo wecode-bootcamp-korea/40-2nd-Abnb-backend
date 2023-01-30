@@ -1,9 +1,50 @@
 const productDao = require("../models/productDao");
 const userDao = require("../models/userDao");
+const {
+  queryBuilder,
+  dateQueryBuilder,
+  createProductList,
+} = require('../util/queryBuilder');
+
 
 const getProductById = async (productId) => {
   const result = await productDao.getProductById(productId);
   return result;
+};
+
+const getAllProducts = async (page, reqQuery) => {
+  const queryList = Object.entries(reqQuery).filter(
+    (ele) =>
+      ele[0] !== 'page' &&
+      ele[1] !== 'false' &&
+      ele[1] !== '상관없음' &&
+      ele[0] !== 'checkIn' &&
+      ele[0] !== 'checkOut'
+  );
+  const bookingList = Object.entries(reqQuery).filter(
+    (ele) => ele[0] === 'checkIn' || ele[0] === 'checkOut'
+  );
+  try {
+    if (queryList.length === 0 && bookingList.length === 0) {
+      return await productDao.getAllProduct(page);
+    }
+
+    if (bookingList.length > 0) {
+      const bookingClause = dateQueryBuilder(bookingList);
+      const result = await productDao.getBookedProduct(bookingClause);
+      const productList = createProductList(result);
+      const queryClause = queryBuilder(queryList, productList);
+      console.log('bookingList', bookingList);
+      console.log('result', result);
+      console.log('queryClause', queryClause);
+      return await productDao.getProductsByQuery(page, queryClause);
+    }
+    const queryClause = queryBuilder(queryList);
+    console.log('queryClause', queryClause);
+    return await productDao.getProductsByQuery(page, queryClause);
+  } catch (err) {
+    throw err;
+  }
 };
 
 const createBooking = async (
@@ -64,6 +105,7 @@ const createHost = async (
 
 module.exports = {
   createBooking,
+  getAllProducts,
   getProductById,
   createHost,
 };
